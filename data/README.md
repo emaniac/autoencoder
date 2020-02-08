@@ -1,4 +1,6 @@
-Here should be the cifar data.
+### The cifar data should be in this directory 
+
+To download, run:
 
 ```
 wget https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
