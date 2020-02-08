@@ -1,0 +1,8 @@
+src/.ipynb_checkpoints/
+__pycache__
+
+# data
+data/data_batch_*
+data/batches.meta
+data/readme.html
+data/test_batch
