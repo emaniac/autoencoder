@@ -7,5 +7,6 @@ docker run -it --rm --runtime=nvidia \
     --workdir=/autoencoder \
     -v $(pwd):/autoencoder \
     -p $PORT:$PORT \
+    -e CUDA_VISIBLE_DEVICES=1 \
     $IMAGE \
     notebook --port=$PORT --ip=0.0.0.0 --allow-root
