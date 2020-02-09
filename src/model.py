@@ -13,58 +13,54 @@ def show_history(history):
     plt.show()
 
 
-class Encoder(tf.keras.layers.Layer):
+def Encoder(N):
 
-    def __init__(self, intermediate_dim):
-        super(Encoder, self).__init__()
+    model = tf.keras.models.Sequential(name='encoder')
 
-        self.hidden_layer = tf.keras.layers.Dense(
-            units=intermediate_dim,
-            activation=tf.nn.relu,
-            kernel_initializer='he_uniform')
+    model.add(tf.keras.layers.Conv2D(input_shape=(32, 32, 3),
+                                     filters=32, 
+                                     kernel_size=(3, 3),
+                                     activation=tf.nn.relu,
+                                     name='encoder_conv1'))
 
-        self.conv_layer = tf.keras.layers.Conv1D(filters=32, 
-                                          kernel_size=(3,), 
-                                          activation=tf.nn.sigmoid)
+    model.add(tf.keras.layers.Conv2D(filters=16, 
+                                      kernel_size=(3, 3),
+                                      activation=tf.nn.relu,
+                                      name='encoder_conv2'))
 
-        self.output_layer = tf.keras.layers.Dense(
-            units=intermediate_dim,
-            activation=tf.nn.sigmoid)
-        
-    def call(self, input_features):
-        activation = self.conv_layer(input_features)
-        activation = self.hidden_layer(activation)
-        return self.output_layer(activation)
+    model.add(tf.keras.layers.Conv2D(filters=8, 
+                                       kernel_size=(3, 3),
+                                       activation=tf.nn.relu,
+                                       name='encoder_conv3'))
 
-class Decoder(tf.keras.layers.Layer):
-    
-    def __init__(self, intermediate_dim, original_dim):
-        super(Decoder, self).__init__()
+    model.add(tf.keras.layers.Flatten(name='encoder_flatten',
+                                      input_shape=(32, 32, 3)))
 
+    model.add(tf.keras.layers.Dense(units=N,
+                                    activation=tf.nn.sigmoid,
+                                    name='encoder_dense'))
 
-        self.hidden_layer = tf.keras.layers.Dense(
-            units=intermediate_dim,
-            activation=tf.nn.relu,
-            kernel_initializer='he_uniform')
-
-        self.output_layer = tf.keras.layers.Dense(
-            units=original_dim,
-            activation=tf.nn.sigmoid)
-    
-    def call(self, code):
-        activation = self.hidden_layer(code)
-        return self.output_layer(activation)
+    return model
 
 
-class Autoencoder(tf.keras.Model):
+def Decoder(N):
 
-    def __init__(self, intermediate_dim, original_dim):
-        super(Autoencoder, self).__init__()
+    model = tf.keras.models.Sequential(name='decoder')
 
-        self.encoder = Encoder(intermediate_dim=intermediate_dim)
-        self.decoder = Decoder(intermediate_dim=intermediate_dim, original_dim=original_dim)
-  
-    def call(self, input_features):
-        code = self.encoder(input_features)
-        reconstructed = self.decoder(code)
-        return reconstructed
+    model.add(tf.keras.layers.Dense(input_shape=(N,),
+                                    units=32 * 32 * 3,
+                                    activation=tf.nn.sigmoid,
+                                    name='decoder_dense2'))
+
+    model.add(tf.keras.layers.Reshape((32, 32, 3),
+                                      name='decoder_reshape'))
+
+    return model
+
+
+def Autoencoder(N):
+
+    model = tf.keras.models.Sequential(name='autoencoder')
+    model.add(Encoder(N))
+    model.add(Decoder(N))
+    return model
