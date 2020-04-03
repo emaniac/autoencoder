@@ -24,17 +24,16 @@ def Encoder(N):
                                      name='encoder_conv1'))
 
     model.add(tf.keras.layers.Conv2D(filters=16, 
-                                      kernel_size=(3, 3),
-                                      activation=tf.nn.relu,
-                                      name='encoder_conv2'))
+                                     kernel_size=(3, 3),
+                                     activation=tf.nn.relu,
+                                     name='encoder_conv2'))
 
     model.add(tf.keras.layers.Conv2D(filters=8, 
-                                       kernel_size=(3, 3),
-                                       activation=tf.nn.relu,
-                                       name='encoder_conv3'))
+                                     kernel_size=(3, 3),
+                                     activation=tf.nn.relu,
+                                     name='encoder_conv3'))
 
-    model.add(tf.keras.layers.Flatten(name='encoder_flatten',
-                                      input_shape=(32, 32, 3)))
+    model.add(tf.keras.layers.Flatten(name='encoder_flatten'))
 
     model.add(tf.keras.layers.Dense(units=N,
                                     activation=tf.nn.sigmoid,
@@ -48,12 +47,26 @@ def Decoder(N):
     model = tf.keras.models.Sequential(name='decoder')
 
     model.add(tf.keras.layers.Dense(input_shape=(N,),
-                                    units=32 * 32 * 3,
+                                    units=5408,
                                     activation=tf.nn.sigmoid,
-                                    name='decoder_dense2'))
+                                    name='decoder_dense1'))
 
-    model.add(tf.keras.layers.Reshape((32, 32, 3),
-                                      name='decoder_reshape'))
+    model.add(tf.keras.layers.Reshape((26, 26, 8), name='decoder_reshape1'))
+
+    model.add(tf.keras.layers.Conv2DTranspose(filters=16, 
+                                              kernel_size=(3, 3), 
+                                              activation=tf.nn.relu,
+                                              name='decoder_conv1'))
+
+    model.add(tf.keras.layers.Conv2DTranspose(filters=32, 
+                                              kernel_size=(3, 3), 
+                                              activation=tf.nn.relu,
+                                              name='decoder_conv2'))
+
+    model.add(tf.keras.layers.Conv2DTranspose(filters=3, 
+                                              kernel_size=(3, 3), 
+                                              activation=tf.nn.sigmoid,
+                                              name='decoder_conv3'))
 
     return model
 
@@ -64,3 +77,4 @@ def Autoencoder(N):
     model.add(Encoder(N))
     model.add(Decoder(N))
     return model
+
